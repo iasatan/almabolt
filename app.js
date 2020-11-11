@@ -14,7 +14,10 @@ app.use("/api/iphone", iphone);
 app.listen(port, () => {
     console.log("Server is running on " + port)
 });
-//});
+
+app.get("/", (req, res) => {
+    res.send("Üdv az almaboltban");
+})
 
 app.get("/helloworld", (req, res) => {
     res.send("Hello World");
