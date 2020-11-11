@@ -31,27 +31,36 @@ router.post("/upload", userMiddleware.isLoggedIn, async (req, res) => {
 router.delete("/:id", userMiddleware.isLoggedIn, async (req, res) => {
     let user = req.userData.email;
     let id = req.params.id;
+    let now = new Date().getTime();
+    const logger = await loadLogCollection();
     if (id && user) {
-        const logger = await loadLogCollection();
+
         const iphones = await loadIphoneCollection();
         logger.insertOne({
             user: user,
             information: "atempted deleting iphone with id of " + id,
-            date: new Date().getTime()
+            date: now
         });
         let success = iphones.deleteOne({_id: new mongodb.ObjectID(id)});
         if (success) {
             logger.insertOne({
                 user: user,
                 information: "iphone with the id of " + id + " has been deleted",
-                date: new Date().getTime()
+                date: now
             });
             res.status(202).send({msg: "deleted"});
         }
+        return;
+    } else {
+        logger.insertOne({
+            user: user,
+            information: "attempted to delete iphone with the id of " + id + " but failed",
+            date: now
+        })
     }
 
 
-})
+});
 
 
 async function loadIphoneCollection() {
